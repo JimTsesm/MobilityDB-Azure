@@ -23,6 +23,7 @@ yes | sudo apt-get install libgsl-dev
 ################################################################################
 #						 Install MobilityDB						   	           #
 ################################################################################
+yes | sudo apt install git-all
 sudo git clone https://github.com/MobilityDB/MobilityDB $currentpath/MobilityDB
 sudo mkdir $currentpath/MobilityDB/build
 cd $currentpath/MobilityDB/build
