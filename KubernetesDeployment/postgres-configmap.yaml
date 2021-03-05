@@ -8,3 +8,5 @@ data:
   POSTGRES_DB: postgresdb
   POSTGRES_USER: postgresadmin
   POSTGRES_PASSWORD: admin123
+  pg_hba.conf: |+
+    host all all 0.0.0.0/0 trust

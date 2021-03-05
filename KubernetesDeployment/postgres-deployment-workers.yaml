@@ -1,19 +1,20 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
-  name: citus-master
+  name: citus-worker
 spec:
   selector:
     matchLabels:
-      app: citus-master
+      app: citus-workers
+  serviceName: citus-workers
   replicas: 1
   template:
     metadata:
       labels:
-        app: citus-master
+        app: citus-workers
     spec:
       containers:
-        - name: citus
+        - name: citus-worker
           image: dimitris007/test:latest
           imagePullPolicy: "IfNotPresent"
           args:
@@ -32,7 +33,8 @@ spec:
           lifecycle:
             postStart:
               exec:
-                command: ["/bin/sh", "-c", "sleep 2;psql -U postgresadmin -d postgres  --command=\"CREATE EXTENSION citus CASCADE;\"; psql -U postgresadmin -d postgres  --command=\"CREATE EXTENSION MobilityDB CASCADE;\";"]
+                command: ["/bin/sh", "-c", "sleep 7;printf \"local all all trust\nhost all all 127.0.0.1/32 trust\nhost all all ::1/128 trust\nhost all all 0.0.0.0/0 trust\n\" > /var/lib/postgresql/data/pg_hba.conf; psql -U postgresadmin -d postgres  --command=\"CREATE EXTENSION citus CASCADE;\"; psql -U postgresadmin -d postgres  --command=\"CREATE EXTENSION MobilityDB CASCADE;\"; psql -U postgresadmin -d postgres  --command=\"select pg_reload_conf();\"; PGPASSWORD=admin123 psql --host=citus-master -U postgresadmin -d postgres --command=\"SELECT * from master_add_node('${HOSTNAME}.citus-workers', 5432);\";"]
+          #      command: ["/bin/sh", "-c", "sleep 5;psql -U postgresadmin -d postgres --command \"SELECT * from cars;\""]
           envFrom:
             - configMapRef:
                 name: postgres-config
