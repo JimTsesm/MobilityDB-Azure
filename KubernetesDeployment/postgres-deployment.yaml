@@ -32,15 +32,30 @@ spec:
           lifecycle:
             postStart:
               exec:
-                command: ["/bin/sh", "-c", "sleep 2;psql -U postgresadmin -d postgres  --command=\"CREATE EXTENSION citus CASCADE;\"; psql -U postgresadmin -d postgres  --command=\"CREATE EXTENSION MobilityDB CASCADE;\";"]
-          envFrom:
-            - configMapRef:
-                name: postgres-config
+                command: ["/bin/sh", "-c", "sleep 2; psql -U \"$( cat /etc/postgresql-secrets-vol/params/username )\" -d postgres  --command=\"CREATE EXTENSION IF NOT EXISTS citus CASCADE;\"; psql -U \"$( cat /etc/postgresql-secrets-vol/params/username )\" -d postgres  --command=\"CREATE EXTENSION IF NOT EXISTS MobilityDB CASCADE;\";"]
+          env:
+          - name: POSTGRES_DB
+            valueFrom:
+              secretKeyRef:
+                name: postgres-secrets-params
+                key: db
+          - name: POSTGRES_USER
+            valueFrom:
+              secretKeyRef:
+                name: postgres-secrets-params
+                key: username
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: postgres-secrets-params
+                key: password
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
               name: postgredb
             - mountPath: /etc/postgresql-secrets-vol
               name: secret-vol
+            - mountPath: /etc/postgresql-secrets-vol/params
+              name: secret-vol-params
       securityContext:
         runAsUser: 0
         supplementalGroups: [999,1000]
@@ -53,3 +68,6 @@ spec:
           secret:
             secretName: postgresql-secrets 
             defaultMode: 0640
+        - name: secret-vol-params
+          secret:
+            secretName: postgres-secrets-params 
