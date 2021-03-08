@@ -23,9 +23,10 @@ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 sudo kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
 sudo kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.2.0/aio/deploy/recommended.yaml
+yes | sudo apt-get install firewalld
 
 #On workers
-sudo kubeadm join 10.0.0.4:6443 --token 52kfja.h54z1uew17dybdj1 --discovery-token-ca-cert-hash sha256:32995b08986ee7e4a230a73402ffc1dc4ec66d995c9ab17a0a6a31bac8909ec4
+
 #After restart
 sudo pico /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
 add ExecStart=/usr/bin/kubelet $KUBELET_KUBECONFIG_ARGS $KUBELET_CONFIG_ARGS $KUBELET_KUBEADM_ARGS $KUBELET_EXTRA_ARGS --cgroup-driver=systemd
@@ -40,6 +41,9 @@ sudo iptables -tnat --flush
 sudo systemctl stop firewalld
 sudo systemctl disable firewalld
 sudo systemctl restart docker
+
+sudo kubeadm join 10.0.0.4:6443 --token mxsbsk.r099tbquv4pjew26     --discovery-token-ca-cert-hash sha256:32995b08986ee7e4a230a73402ffc1dc4ec66d995c9ab17a0a6a31bac8909ec4 
+
 
 ###Pods
 #Describe Pod
