@@ -7,12 +7,27 @@ spec:
     matchLabels:
       app: citus-workers
   serviceName: citus-workers
-  replicas: 1
+  replicas: 2
+  selector:
+    matchLabels:
+      app: citus-workers
   template:
     metadata:
       labels:
         app: citus-workers
     spec:
+    #Add Node Affinity to equally distribute the replicas in the Cluster's nodes.
+    #Assign explicitly 1 replica per node with requiredDuringSchedulingIgnoredDuringExecution
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app"
+                    operator: In
+                    values:
+                    - citus-workers
+              topologyKey: "kubernetes.io/hostname"
       containers:
         - name: citus-worker
           image: dimitris007/test:latest
@@ -81,4 +96,4 @@ spec:
             defaultMode: 0640
         - name: secret-vol-params
           secret:
-            secretName: postgres-secrets-params 
+            secretName: postgres-secrets-params
