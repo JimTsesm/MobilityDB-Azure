@@ -11,8 +11,8 @@
 # VMsNumber determines the number of Worker nodes and VMsSize the size of each machine. 
 # SSHPublicKeyPath and SSHPrivateKeyPath values specify the location of the ssh private 
 # and public keys to access the created VMs. By default, the files will be stored in 
-# ~/.ssh/ directory. Finally, InstallationScript specifies the path where the installMobilityDB.sh
-# script is stored.
+# ~/.ssh/ directory. Finally, DeploymentZip specifies the path where the MobilityDB-in-Azure.tar.gz
+# file is stored. The tar file should contain the content of the github repository.
 
 ################################################################################
 #							    Configuration						   		   #
@@ -26,10 +26,6 @@ VMsSize="Standard_B2s" #Visit https://azure.microsoft.com/en-us/pricing/details/
 # to see the full list of available VMs
 SSHPublicKeyPath="~/.ssh/id_rsa.pub"
 SSHPrivateKeyPath="~/.ssh/id_rsa"
-#InstallationScript="/home/dimitris/Desktop/thesis/MobilityDB-in-Azure/automaticClusterDeployment/KubernetesCluster/installDockerK8s.sh"
-#RunOnMaster="/home/dimitris/Desktop/thesis/MobilityDB-in-Azure/automaticClusterDeployment/KubernetesCluster/runOnMaster.sh"
-#RunOnMaster2="/home/dimitris/Desktop/thesis/MobilityDB-in-Azure/automaticClusterDeployment/KubernetesCluster/runOnMaster2.sh"
-#RunOnWorker="/home/dimitris/Desktop/thesis/MobilityDB-in-Azure/automaticClusterDeployment/KubernetesCluster/runOnWorker.sh"
 DeploymentZip="/home/dimitris/Desktop/thesis/MobilityDB-in-Azure.tar.gz"
 ################################################################################
 
@@ -67,10 +63,6 @@ scp -o StrictHostKeyChecking=no -i $SSHPrivateKeyPath $DeploymentZip azureuser@$
 #Untar
 az vm run-command invoke -g $ResourceGroupName -n Coordinator --command-id RunShellScript --scripts "sudo tar xvzf /home/azureuser/MobilityDB-in-Azure.tar.gz -C /home/azureuser"
 
-#scp -o StrictHostKeyChecking=no -i $SSHPrivateKeyPath $InstallationScript azureuser@$ip:/home/azureuser/installDockerK8s.sh;
-#scp -o StrictHostKeyChecking=no -i $SSHPrivateKeyPath $RunOnMaster azureuser@$ip:/home/azureuser/runOnMaster.sh;
-#scp -o StrictHostKeyChecking=no -i $SSHPrivateKeyPath $RunOnMaster2 azureuser@$ip:/home/azureuser/runOnMaster2.sh;
-
 #Execute the previously sent bash file	 	
 az vm run-command invoke -g $ResourceGroupName -n $VMName --command-id RunShellScript --scripts "sudo bash /home/azureuser/MobilityDB-in-Azure/automaticClusterDeployment/KubernetesCluster/installDockerK8s.sh"
 az vm run-command invoke -g $ResourceGroupName -n $VMName --command-id RunShellScript --scripts "sudo bash /home/azureuser/MobilityDB-in-Azure/automaticClusterDeployment/KubernetesCluster/runOnMaster.sh"
@@ -107,9 +99,6 @@ do
 	#Untar
 	az vm run-command invoke -g $ResourceGroupName -n $VMName --command-id RunShellScript --scripts "sudo tar xvzf /home/azureuser/MobilityDB-in-Azure.tar.gz -C /home/azureuser"
 
-	#scp -o StrictHostKeyChecking=no -i $SSHPrivateKeyPath $InstallationScript azureuser@$ip:/home/azureuser/installDockerK8s.sh;
-	#scp -o StrictHostKeyChecking=no -i $SSHPrivateKeyPath $RunOnWorker azureuser@$ip:/home/azureuser/runOnWorker.sh;
-	
 done
 
 #Install the required software to every Worker
@@ -151,6 +140,6 @@ echo "Worker Nodes were successfully added to the cluster."
 #								MobilityDB Deployment						   #
 ################################################################################
 
-az vm run-command invoke -g $ResourceGroupName -n Coordinator --command-id RunShellScript --scripts "bash /home/azureuser/MobilityDB-in-Azure/KubernetesDeployment/scripts/startK8s.sh"
+#az vm run-command invoke -g $ResourceGroupName -n Coordinator --command-id RunShellScript --scripts "bash /home/azureuser/MobilityDB-in-Azure/KubernetesDeployment/scripts/startK8s.sh"
 
 ################################################################################
