@@ -4,7 +4,7 @@ metadata:
   name: postgres-pv-volume
   labels:
     type: local
-    app: citus-master
+    app: citus-workers
 spec:
   storageClassName: manual
   capacity:
@@ -19,7 +19,7 @@ apiVersion: v1
 metadata:
   name: postgres-pv-claim
   labels:
-    app: citus-master
+    app: citus-workers
 spec:
   storageClassName: manual
   accessModes:
