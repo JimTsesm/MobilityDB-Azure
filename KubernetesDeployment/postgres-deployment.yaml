@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: citus
-          image: dimitris007/test:latest
+          image: dimitris007/mobilitydb:citus10
           imagePullPolicy: "IfNotPresent"
           args:
             - -c
