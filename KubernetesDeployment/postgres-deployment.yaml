@@ -12,6 +12,9 @@ spec:
       labels:
         app: citus-master
     spec:
+    #Assign Citus coordinator to master node (needs to have untainted master node first)
+      nodeSelector:
+        dedicated: master
       containers:
         - name: citus
           image: dimitris007/mobilitydb:citus10
