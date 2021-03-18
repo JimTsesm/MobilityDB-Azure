@@ -6,6 +6,7 @@
 # More specifically, the cluster will be hosted in Microsoft Azure, hence an Azure
 # account with a valid subscription is needed to run it. To corectly initialize the 
 # cluster, the following Configuration tab should be parametrized:
+# AzureUsername parameter is used to login your Azure account.
 # The default ResourceGroupName, Location and VirtualNetwork values can be used.
 # Subscription defines the name of the active Azure subscription.
 # VMsNumber determines the number of Worker nodes and VMsSize the size of each machine. 
@@ -17,11 +18,12 @@
 ################################################################################
 #							    Configuration						   		   #
 ################################################################################
-ResourceGroupName="DimitrisMSc"
+AzureUsername="dimitrios.tsesmelis@ulb.be"
+ResourceGroupName="ClusterGroup"
 Location="germanywestcentral"
 VirtualNetwork="clustergroup-vnet"
-Subscription="WIT"
-VMsNumber=2
+Subscription="ULB subscription"
+VMsNumber=1
 VMsSize="Standard_B2s" #Visit https://azure.microsoft.com/en-us/pricing/details/virtual-machines/series/ 
 # to see the full list of available VMs
 SSHPublicKeyPath="~/.ssh/id_rsa.pub"
@@ -31,10 +33,10 @@ DeploymentZip="/home/dimitris/Desktop/thesis/MobilityDB-in-Azure.tar.gz"
 
 
 #Login to Azure using Azure CLI
-az login
+read -sp "Azure password: " AZ_PASS && echo && az login -u $AzureUsername -p $AZ_PASS
 
 #Select the desired subscription
-az account set --subscription $Subscription
+az account set --subscription "$Subscription"
 
 #Create a new Resource Group
 az group create --name $ResourceGroupName --location $Location
