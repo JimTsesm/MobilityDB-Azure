@@ -11,5 +11,5 @@ sudo kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.
 
 #By default, the cluster will not schedule pods on the control-plane node for security reasons. 
 #If you want to be able to schedule pods on the control-plane node, run:
-kubectl label nodes coordinator dedicated=master
-kubectl taint nodes --all node-role.kubernetes.io/master-
+sudo kubectl label nodes coordinator dedicated=master
+sudo kubectl taint nodes --all node-role.kubernetes.io/master-
