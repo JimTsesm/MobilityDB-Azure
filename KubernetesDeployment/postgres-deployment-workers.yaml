@@ -7,7 +7,7 @@ spec:
     matchLabels:
       app: citus-workers
   serviceName: citus-workers
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: citus-workers
