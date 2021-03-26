@@ -7,7 +7,6 @@ ResourceGroupName="ClusterGroup"
 Location="germanywestcentral"
 VirtualNetwork="clustergroup-vnet"
 Subscription="Andreacs"
-VMsNumber=1
 VMsSize="Standard_A1_v2" #Visit https://azure.microsoft.com/en-us/pricing/details/virtual-machines/series/ 
 # to see the full list of available VMs
 SSHPublicKeyPath="~/.ssh/id_rsa.pub"

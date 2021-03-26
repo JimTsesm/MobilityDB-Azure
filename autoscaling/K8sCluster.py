@@ -10,6 +10,7 @@ import os
 import CitusCluster
 import Azure
 from kubernetes import client, config
+import time
 
 class K8sCluster:
 
@@ -30,7 +31,7 @@ class K8sCluster:
 
     # Add vm_to_create number of VMs to the existing Kubernetes cluster
     def cluster_scale_out(self, vm_to_create):
-        vm_list = self.azure.compute_client.virtual_machines.list("ClusterGroup")
+        vm_list = self.azure.get_deployed_vms()
         max_worker_name = 0
         vm_name_list = []
 
@@ -58,6 +59,7 @@ class K8sCluster:
     def cluster_scale_in(self, vm_to_delete):
         vm_list = self.azure.compute_client.virtual_machines.list("ClusterGroup")
         vm_name_list = []
+        remove_flag = False
 
         # Append all the Worker names in a list
         for vm in vm_list:
@@ -78,9 +80,17 @@ class K8sCluster:
         if(remove_flag):
             # Sort the list in descending order
             vm_name_list.sort(reverse=True)
+            workers_ip = []
             for i in range(vm_to_delete):
-                worker_ip = self.get_pod_internal_ip(i)
-                self.citus_cluster.delete_node(worker_ip)
+                # Get pod's ip
+                workers_ip.append(self.get_pod_internal_ip(vm_name_list[i]-1))
+            # Delete Worker nodes from Citus cluster
+            self.citus_cluster.delete_node(workers_ip)
+            # Delete Worker nodes from K8s cluster
+            new_cluster_size = len(vm_name_list) - vm_to_delete
+            self.delete_cluster_nodes(new_cluster_size, vm_name_list[:vm_to_delete])
+            # Delete Worker nodes from Azure
+            self.azure.delete_vms(vm_name_list[:vm_to_delete])
 
     # Return Coordinator's VM public ip address
     def get_coordinator_ip(self):
@@ -99,19 +109,31 @@ class K8sCluster:
 
     # Return the ip of the pod with name citus-worker-[worker_num]
     def get_pod_internal_ip(self, worker_num):
-        print("Listing pods with their IPs:")
         ret = self.k8s.list_pod_for_all_namespaces(watch=False)
         for pod in ret.items:
-            print(pod.metadata.name)
             if(pod.metadata.name == "citus-worker-"+str(worker_num)):
-                print(pod.status.pod_ip)
+                return pod.status.pod_ip
+
+    # Delete K8s cluster nodes
+    def delete_cluster_nodes(self, new_cluster_size, worker_numbers):
+        # Scale in the Stateful Set
+        subprocess.check_call(['sudo', 'kubectl', 'scale', 'statefulsets', 'citus-worker', '--replicas=%s' % str(new_cluster_size)] )
+        # Wait 10 seconds until the pod is terminated
+        time.sleep(10)
+        for worker_num in worker_numbers:
+            worker_name = "worker"+str(worker_num)
+            print(worker_name)
+            # Drain the node
+            subprocess.check_call(['sudo', 'kubectl', 'drain', worker_name, '--ignore-daemonsets'])
+            # Delete the node
+            subprocess.check_call(['sudo', 'kubectl', 'delete', 'node', worker_name])
 
 
 
 #cluster_scale_out(compute_client, 2)
 
 
-cluster = K8sCluster(1,10)
-cluster.cluster_scale_out(1)
+cluster = K8sCluster(2,10)
+cluster.cluster_scale_in(1)
 #citusCluster.get_pod_internal_ip(0)
 #citusCluster.cluster_scale_in(12)
