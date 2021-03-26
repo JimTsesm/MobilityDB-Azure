@@ -63,6 +63,4 @@ class Azure:
                     async_disk_delete.wait()
             except CloudError:
                 print('A VM delete operation failed: {}'.format(traceback.format_exc()))
-                return False
             print("Deleted VM {}".format(vm_name))
-            return True
