@@ -129,10 +129,6 @@ class K8sCluster:
             subprocess.check_call(['sudo', 'kubectl', 'delete', 'node', worker_name])
 
 
-
-#cluster_scale_out(compute_client, 2)
-
-
 cluster = K8sCluster(2,10)
 cluster.cluster_scale_in(1)
 #citusCluster.get_pod_internal_ip(0)

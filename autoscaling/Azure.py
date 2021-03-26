@@ -44,6 +44,9 @@ class Azure:
                 async_vm_delete.wait()
                 net_del_poller = self.network_client.network_interfaces.delete(self.resource_group, nic_name)
                 net_del_poller.wait()
+                # Wait until the Network Interface is deleted to proceed
+                while(not net_del_poller.done()):
+                    sleep(5)
                 async_nsg = self.network_client.network_security_groups.delete(self.resource_group, nsg_name)
                 async_nsg.wait()
                 async_ip = self.network_client.public_ip_addresses.delete(self.resource_group, ip_name)
@@ -52,7 +55,7 @@ class Azure:
                 disk_handle_list = []
                 for disk in disks_list:
                     if vm_name in disk.name:
-                        print(disk.name)
+                        print('Delete Disk {}'.format(disk.name))
                         async_disk_delete = self.compute_client.disks.delete(self.resource_group, disk.name)
                         disk_handle_list.append(async_disk_delete)
                 print("Queued disks will be deleted now...")
