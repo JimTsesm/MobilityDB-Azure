@@ -127,9 +127,3 @@ class K8sCluster:
             subprocess.check_call(['sudo', 'kubectl', 'drain', worker_name, '--ignore-daemonsets'])
             # Delete the node
             subprocess.check_call(['sudo', 'kubectl', 'delete', 'node', worker_name])
-
-
-cluster = K8sCluster(2,10)
-cluster.cluster_scale_in(1)
-#citusCluster.get_pod_internal_ip(0)
-#citusCluster.cluster_scale_in(12)
