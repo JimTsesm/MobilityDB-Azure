@@ -1,11 +1,13 @@
+import os
+
 import psycopg2
 
 class CitusCluster:
     def __init__(self, coordinator_ip):
-        self.POSTGREDB = "postgres"
-        self.POSTGREUSER = "postgresadmin"
-        self.POSTGREPASSWORD = "admin1234"
-        self.POSTGREPORT = "31978"
+        self.POSTGREDB = os.environ['POSTGREDB']
+        self.POSTGREUSER = os.environ['POSTGREUSER']
+        self.POSTGREPASSWORD = os.environ['POSTGREPASSWORD']
+        self.POSTGREPORT = os.environ['POSTGREPORT']
         self.COORDIP = coordinator_ip
         # Establish connection with the Citus Coordinator
         self.connection = psycopg2.connect(database=self.POSTGREDB, user=self.POSTGREUSER, password=self.POSTGREPASSWORD, host=self.COORDIP,
