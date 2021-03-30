@@ -85,7 +85,7 @@ class Azure:
                 subscription_id
             )
 
-        # Return a list of values representing the timeseries of the specified metric for the VMs under the given Resource Group.
+        # Return a list of values for each VM under the given Resource Group.. Each list represents the timeseries of the specified metric for the VM.
         # The timeseries contains the values of the last "internval" minutes and the granulatiry is of 1 minute.
         # Aggregation parameter spesifies how the returned metrics are aggregated: {Average, Total, Minimum, Maximum, Count}
         def get_azure_metric(self, metric, interval, aggregation='Average'):
@@ -96,6 +96,9 @@ class Azure:
             # For each VM, request the desired metric
             for vm in vm_list:
                 vm_name = vm.name
+                # Ignore Coordinator's metrics
+                if(vm_name == "Coordinator"):
+                    continue
 
                 # Create VM's resource id
                 resource_id = (

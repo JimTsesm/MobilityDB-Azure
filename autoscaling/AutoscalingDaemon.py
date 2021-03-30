@@ -1,24 +1,50 @@
 import time
 import logging
 import os
-import sys
 import argparse
 import utils
+from K8sCluster import K8sCluster
 
 from daemons.prefab import run
 
 
 class AutoscalingDaemon(run.RunDaemon):
 
+    def __init__(self, pidfile, minvm, maxvm, storage_path, metric, observations_interval):
+        super().__init__(pidfile=pidfile)
+        self.minvm = minvm
+        self.maxvm = maxvm
+        self.metric = metric
+        self.observations_interval = observations_interval
+        self.storage_path = storage_path
+
+    def monitor(self):
+        return self.k8s_cluster.azure.monitor.get_azure_metric(metric=self.metric, interval=self.observations_interval)
+
+    def analyze(self, vms_observations):
+        # For each VM
+        for vm_name in vms_observations.keys():
+            vm_average_metric = utils.list_average(vms_observations[vm_name])
+            logging.info(vm_average_metric)
+
     def run(self):
-        if (os.path.exists("/home/dimitris/Desktop/thesis/MobilityDB-in-Azure/autoscaling/test_dir")):
+
+        # Daemon restarted
+        if (os.path.exists(self.storage_path)):
             logging.info("Continuing from a past state...")
+
+        # Daemon initialized for the first time
         else:
             logging.info("Starting new state")
-            os.mkdir("/home/dimitris/Desktop/thesis/MobilityDB-in-Azure/autoscaling/test_dir")
+            os.mkdir(self.storage_path)
+        # to be handled according to start/restart
+        self.k8s_cluster = K8sCluster(self.minvm, self.maxvm)
+        # Run Daemon's job
         while True:
-            logging.info('do something.......')
-            time.sleep(1)
+            self.analyze(self.monitor())
+            time.sleep(10)
+
+
 
 if __name__ == '__main__':
 
@@ -30,6 +56,8 @@ if __name__ == '__main__':
                         help='Minimum number of Worker VMs.')
     parser.add_argument('--maxvm', dest='maxvm', required=True,
                         help='Maximum number of Worker VMs.')
+    parser.add_argument('--storage', dest='storage_path', required=True,
+                        help='Specify a storage path.')
     args = parser.parse_args()
 
     # Check if range arguments are correct
@@ -40,7 +68,7 @@ if __name__ == '__main__':
                         format='[%(asctime)s] - %(levelname)s - %(message)s')
     pidfile = os.path.join(os.getcwd(), "/var/run/autoscaling.pid")
 
-    d = AutoscalingDaemon(pidfile=pidfile)
+    d = AutoscalingDaemon(pidfile, args.minvm, args.maxvm, args.storage_path, metric="Percentage CPU", observations_interval=10)
 
     # Decide which Daemon action to do
     if args.action == "start":
