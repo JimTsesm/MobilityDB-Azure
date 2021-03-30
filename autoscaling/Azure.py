@@ -87,9 +87,8 @@ class Azure:
 
         # Return a list of values representing the timeseries of the specified metric for the VMs under the given Resource Group.
         # The timeseries contains the values of the last "internval" minutes and the granulatiry is of 1 minute.
-        # "utc_dif" parameter needs to be configured according to the physical location of the VMs
         # Aggregation parameter spesifies how the returned metrics are aggregated: {Average, Total, Minimum, Maximum, Count}
-        def get_azure_metric(self, metric, interval, utc_dif, aggregation='Average'):
+        def get_azure_metric(self, metric, interval, aggregation='Average'):
             # Get the VMs' names
             vm_list = self.parent.get_deployed_vms()
             result = {}
@@ -105,11 +104,7 @@ class Azure:
                     "providers/Microsoft.Compute/virtualMachines/{}"
                 ).format(self.subscription_id, self.resource_group, vm_name)
 
-                # Compute the time to match the VM's availability zone
-                if(utc_dif > 0):
-                    now = datetime.utcnow() + timedelta(hours=utc_dif)
-                else:
-                    now = datetime.utcnow() - timedelta(hours=utc_dif)
+                now = datetime.utcnow()
                 start_time = now - timedelta(minutes=interval)
 
                 metrics_data = self.monitor_client.metrics.list(
