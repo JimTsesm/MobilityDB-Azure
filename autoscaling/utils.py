@@ -1,6 +1,8 @@
 import argparse
+import logging
 
-def range_type(min, max):
+
+def range_type(min, max, min_required, max_required=None):
     try:
         min = int(min)
         max = int(max)
@@ -8,13 +10,42 @@ def range_type(min, max):
         print(f'You entered , which is not a positive number.')
         raise argparse.ArgumentTypeError("minvm and maxvm should be positive integers")
 
-    if (min > 0 and max > 0 and max > min):
-        return
+    if(max_required is None):
+        if (min > min_required and max > min):
+            return
+        else:
+            raise argparse.ArgumentTypeError("minvm shoulb be < than maxvm.")
     else:
-        raise argparse.ArgumentTypeError("minvm shoulb be < than maxvm.")
+        if (min > min_required and max < max_required and max > min):
+            return
+        else:
+            raise argparse.ArgumentTypeError("minvm shoulb be < than maxvm.")
 
-def list_average(integers_list):
-    if(len(integers_list) > 0):
-        return sum([pair[1] for pair in integers_list if pair[1] is not None]) / len(integers_list)
+def list_average(integers_list, tuple_list=False):
+    if(tuple_list):
+        if(len(integers_list) > 0):
+            l = [pair[1] for pair in integers_list if (pair[1] is not None and pair[1] > 0.0)]
+            return sum(l) / len(l)
+        else:
+            return 0.0
     else:
-        return 0.0
+        if (len(integers_list) > 0):
+            l = [i for i in integers_list if (i is not None and i > 0.0)]
+            return sum(l) / len(l)
+        else:
+            return 0.0
+
+def setup_loggers(level=logging.INFO):
+    # Configure the default logger
+    logging.basicConfig(filename='/var/log/autoscaling.log', level=logging.INFO, filemode='a',
+                        format='[%(asctime)s] - %(levelname)s - %(message)s')
+    # Configure the performance logger
+    formatter = logging.Formatter('[%(asctime)s] - %(levelname)s - %(message)s')
+    handler = logging.FileHandler("/var/log/autoscaling_performance.log", mode='a')
+    handler.setFormatter(formatter)
+
+    performance_logger = logging.getLogger("performance_logger")
+    performance_logger.setLevel(level)
+    performance_logger.addHandler(handler)
+
+    return performance_logger
