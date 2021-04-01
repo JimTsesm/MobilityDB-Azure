@@ -26,7 +26,7 @@ class AutoscalingDaemon(run.RunDaemon):
         return self.k8s_cluster.azure.monitor.get_azure_metric(metric=self.metric, interval=self.observations_interval)
 
     # Receive the metrics computed by the monitor phase and compute the average metric of each VM.
-    def analyze(self, vms_observations):
+    def analyze_with_average(self, vms_observations):
         vms_average = []
         vote_to_scale_out = 0
         vote_to_scale_in = 0
@@ -42,31 +42,68 @@ class AutoscalingDaemon(run.RunDaemon):
             else:
                 vote_nothing += 1
             vms_average.append(vm_average_metric)
-            self.performance_logger.info(vm_average_metric)
+            self.performance_logger.info("METRIC;"+vm_name+";"+str(vm_average_metric))
 
         return vote_to_scale_out, vote_to_scale_in, vote_nothing, vms_average
 
-    def plan(self, vote_to_scale_out, vote_to_scale_in, vote_nothing, vms_average):
+    def analyze_with_duration(self, vms_observations):
+        vms_average = []
+        vote_to_scale_out = 0
+        vote_to_scale_in = 0
+        vote_nothing = 0
+
+        # For each VM compute for how many minutes the VM's metric exceed the upper/lower threshold
+        for vm_name in vms_observations.keys():
+            vm_average_metric = utils.list_average(vms_observations[vm_name], tuple_list=True)
+            violate_upper_threshold = utils.greater_than_threshold(vms_observations[vm_name], self.upper_threshold, tuple_list=True)
+            violate_lower_threshold = utils.less_than_threshold(vms_observations[vm_name], self.lower_threshold, tuple_list=True)
+
+            # If for all the previous observations the metric was > self.upper_threshold, vote to scale out
+            if(all(element == 1 for element in violate_upper_threshold)):
+                vote_to_scale_out += 1
+            # If for all the previous observations the metric was < self.lower_threshold, vote to scale in
+            elif (all(element == 1 for element in violate_lower_threshold)):
+                vote_to_scale_in += 1
+            else:
+                vote_nothing += 1
+
+            # Log the metrics for the past observations
+            for timestamp, metric_value in vms_observations[vm_name]:
+                self.performance_logger.info(str(timestamp)+";METRIC;"+vm_name+";"+str(metric_value))
+
+            vms_average.append(vm_average_metric)
+
+        return vote_to_scale_out, vote_to_scale_in, vote_nothing, vms_average
+
+    def plan_n_execute(self, vote_to_scale_out, vote_to_scale_in, vote_nothing, vms_average):
         # Scale out according to votes
         if(vote_to_scale_out > vote_to_scale_in and vote_to_scale_out > vote_nothing):
-            self.performance_logger.info("Scaling out...")
+            self.performance_logger.info("SCALEOUT;;1")
+            self.k8s_cluster.cluster_scale_out(1)
+            self.enter_cool_down_period(10)
         # Scale in according to votes
         elif(vote_to_scale_out < vote_to_scale_in and vote_to_scale_in > vote_nothing):
-            self.performance_logger.info("Scaling in...")
+            self.performance_logger.info("SCALEIN;;1")
+            self.k8s_cluster.cluster_scale_in(1)
+            self.enter_cool_down_period(10)
         # If no decision can be taken according to votes, compute the global average metric
         else:
             global_average = utils.list_average(vms_average)
             if(global_average > self.upper_threshold):
-                self.performance_logger.info("Scaling out 2...")
+                self.performance_logger.info("SCALEOUT;;1")
+                self.k8s_cluster.cluster_scale_out(1)
+                self.enter_cool_down_period(10)
             elif(global_average < self.lower_threshold):
-                self.performance_logger.info("Scaling in 2...")
-            else:
-                self.performance_logger.info("Do nothing...")
-    
+                self.performance_logger.info("SCALEIN;;1")
+                self.k8s_cluster.cluster_scale_in(1)
+                self.enter_cool_down_period(10)
+
+
     def enter_cool_down_period(self, minutes):
-        self.performance_logger.info("Entering to cool down period for "+str(minutes)+" minutes")
+        self.performance_logger.info("COOLDOWN;;"+str(minutes))
+        # Sleep
         time.sleep(minutes * 60)
-        self.performance_logger.info("Exciting from cool down period")
+
 
     def run(self):
 
@@ -83,9 +120,9 @@ class AutoscalingDaemon(run.RunDaemon):
 
         # Run Daemon's job
         while True:
-            vote_to_scale_out, vote_to_scale_in, vote_nothing, vms_average = self.analyze(self.monitor())
-            self.plan(vote_to_scale_out, vote_to_scale_in, vote_nothing, vms_average)
-            time.sleep(self.observations_interval * 60)
+            vote_to_scale_out, vote_to_scale_in, vote_nothing, vms_average = self.analyze_with_duration(self.monitor())
+            self.plan_n_execute(vote_to_scale_out, vote_to_scale_in, vote_nothing, vms_average)
+            time.sleep(60)
 
 
 

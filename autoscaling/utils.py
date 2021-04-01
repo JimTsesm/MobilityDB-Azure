@@ -35,12 +35,20 @@ def list_average(integers_list, tuple_list=False):
         else:
             return 0.0
 
+def greater_than_threshold(observation_list, u_threshold, tuple_list=False):
+    if (tuple_list):
+        return [1 if (pair[1] is None or pair[1] > u_threshold) else 0 for pair in observation_list]
+
+def less_than_threshold(observation_list, l_threshold, tuple_list=False):
+    if (tuple_list):
+        return [1 if (pair[1] is None or pair[1] < l_threshold) else 0 for pair in observation_list]
+
 def setup_loggers(level=logging.INFO):
     # Configure the default logger
     logging.basicConfig(filename='/var/log/autoscaling.log', level=logging.INFO, filemode='a',
                         format='[%(asctime)s] - %(levelname)s - %(message)s')
     # Configure the performance logger
-    formatter = logging.Formatter('[%(asctime)s] - %(levelname)s - %(message)s')
+    formatter = logging.Formatter('[%(asctime)s];%(levelname)s;%(message)s')
     handler = logging.FileHandler("/var/log/autoscaling_performance.log", mode='a')
     handler.setFormatter(formatter)
 

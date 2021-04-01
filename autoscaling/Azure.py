@@ -108,7 +108,7 @@ class Azure:
                 ).format(self.subscription_id, self.resource_group, vm_name)
 
                 now = datetime.utcnow()
-                start_time = now - timedelta(minutes=interval)
+                start_time = now - timedelta(minutes=interval+1)
 
                 metrics_data = self.monitor_client.metrics.list(
                     resource_id,
@@ -133,7 +133,6 @@ class Azure:
                                 timeserie_res.append((data.time_stamp, data.maximum))
                             elif (aggregation == "Count"):
                                 timeserie_res.append((data.time_stamp, data.count))
-                            print("{}: {}".format(data.time_stamp, data))
 
                 # Add the timeseries of the VM in a dictionary
                 result[vm_name] = timeserie_res

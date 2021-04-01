@@ -20,7 +20,7 @@ class K8sCluster:
         self.k8s = client.CoreV1Api()
 
         self.AZUREPASSWORD = os.environ['AZURE_PASSWORD']
-
+        self.SCRIPTPATH = os.environ['SCRIPTPATH']
         self.minimum_vms = minimum_vms
         self.maximum_vm = maximum_vm
 
@@ -46,14 +46,14 @@ class K8sCluster:
         if (len(vm_name_list) + vm_to_create <= self.maximum_vm):
             print("creating "+str(vm_to_create) + "VMs")
             # Call the addNewVms.sh bash script to deploy vm_to_create number of VMs
-            rc = subprocess.check_call(['./scripts/addNewVms.sh', self.AZUREPASSWORD, str(max_worker_name + 1), str(max_worker_name + vm_to_create), str(max_worker_name + vm_to_create - 1)])
+            rc = subprocess.check_call([self.SCRIPTPATH+'/addNewVms.sh', self.AZUREPASSWORD, str(max_worker_name + 1), str(max_worker_name + vm_to_create), str(max_worker_name + vm_to_create - 1)])
         # If the maximum number of VMs will be exceeded, modify the number of VMs to be added
         else:
             vm_to_create = self.maximum_vm - len(vm_name_list)
             if (vm_to_create > 0):
                 print("creating " + str(vm_to_create) + "VMs")
                 # Call the addNewVms.sh bash script to deploy vm_to_create number of VMs
-                rc = subprocess.check_call(['./scripts/addNewVms.sh', self.AZUREPASSWORD, str(max_worker_name + 1), str(max_worker_name + vm_to_create), str(max_worker_name + vm_to_create -1)])
+                rc = subprocess.check_call([self.SCRIPTPATH+'/addNewVms.sh', self.AZUREPASSWORD, str(max_worker_name + 1), str(max_worker_name + vm_to_create), str(max_worker_name + vm_to_create -1)])
 
 
     def cluster_scale_in(self, vm_to_delete):
