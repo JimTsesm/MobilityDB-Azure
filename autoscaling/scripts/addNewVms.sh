@@ -25,13 +25,19 @@ az account set --subscription "$Subscription"
 #								Workers Creation							   #
 ################################################################################
 
-#Create the VMs with the given parameters
+#Create the VMs with the given parameters in parallel
 for i in $(seq $2 $3)
 do
 	VMName="Worker$i";
 	
 	#Create the VM
-	az vm create	--name $VMName --resource-group $ResourceGroupName --public-ip-address-allocation static --image "UbuntuLTS" --size $VMsSize --vnet-name $VirtualNetwork --subnet default --ssh-key-value $SSHPublicKeyPath --admin-username azureuser;
+	az vm create	--name $VMName --resource-group $ResourceGroupName --public-ip-address-allocation static --image "UbuntuLTS" --size $VMsSize --vnet-name $VirtualNetwork --subnet default --ssh-key-value $SSHPublicKeyPath --admin-username azureuser &
+done
+wait #for all the subprocesses of the parallel loop to terminate
+
+for i in $(seq $2 $3)
+do
+	VMName="Worker$i";
 
 	#Open port 5432 to accept inbound connection from the Citus coordinator
 	az vm open-port -g $ResourceGroupName -n $VMName --port 5432 --priority 1010;
