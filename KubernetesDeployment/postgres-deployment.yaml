@@ -23,7 +23,7 @@ spec:
             - -c
             - max_locks_per_transaction=128
             - -c
-            - shared_preload_libraries=citus,postgis-2.5.so
+            - shared_preload_libraries=citus,postgis-2.5.so,pg_stat_statements
             - -c
             - ssl=on
             - -c
@@ -36,7 +36,7 @@ spec:
             postStart:
               exec:
               #Command to be executed after the initialization of the worker Pod: 1) Create Extensions
-                command: ["/bin/sh", "-c", "sleep 2; psql -U \"$( cat /etc/postgresql-secrets-vol/params/username )\" -d \"$( cat /etc/postgresql-secrets-vol/params/db )\"  --command=\"CREATE EXTENSION IF NOT EXISTS citus CASCADE;\"; psql -U \"$( cat /etc/postgresql-secrets-vol/params/username )\" -d \"$( cat /etc/postgresql-secrets-vol/params/db )\"  --command=\"CREATE EXTENSION IF NOT EXISTS MobilityDB CASCADE;\";"]
+                command: ["/bin/sh", "-c", "sleep 2; psql -U \"$( cat /etc/postgresql-secrets-vol/params/username )\" -d \"$( cat /etc/postgresql-secrets-vol/params/db )\"  --command=\"CREATE EXTENSION IF NOT EXISTS citus CASCADE;\"; psql -U \"$( cat /etc/postgresql-secrets-vol/params/username )\" -d \"$( cat /etc/postgresql-secrets-vol/params/db )\"  --command=\"CREATE EXTENSION IF NOT EXISTS MobilityDB CASCADE;\"; psql -U \"$( cat /etc/postgresql-secrets-vol/params/username )\" -d \"$( cat /etc/postgresql-secrets-vol/params/db )\"  --command=\"CREATE EXTENSION IF NOT EXISTS pg_stat_statements;\";"]
           env:
           - name: POSTGRES_DB
             valueFrom:
