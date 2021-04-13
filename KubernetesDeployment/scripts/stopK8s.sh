@@ -1,5 +1,7 @@
 #!/bin/bash
 sudo kubectl patch pvc postgres-pv-claim -p '{"metadata":{"finalizers": []}}' --type=merge
+sudo kubectl patch pv postgres-pv-volume-coordinator -p '{"metadata":{"finalizers": []}}' --type=merge
+
 sudo kubectl delete service citus-master 
 sudo kubectl delete service citus-workers
 sudo kubectl delete deployment citus-master
