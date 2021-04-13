@@ -14,6 +14,11 @@ class CitusCluster:
                                port=self.POSTGREPORT)
         print("Database opened successfully")
 
+    def __del__(self):
+        # Close the connection with the Citus Coordinator when the object is destroyed
+        self.connection.close()
+        print("Database closed successfully")
+
     def delete_node(self, nodes_ip):
         cur = self.connection.cursor()
 
@@ -30,3 +35,31 @@ class CitusCluster:
 
         # Commit the transaction
         self.connection.commit()
+
+        # Close the cursor
+        cur.close()
+
+    def get_sessions_log_table(self, interval=5):
+        cur = self.connection.cursor()
+
+        # NOW row illustrates the AVERAGE number of active sessions the last "interval" minutes.
+        # BEFORE row shows the same quantity between the last "interval" and "interval + 5" minutes.
+        query = "\
+                SELECT 'NOW' AS period, CEIL(AVG(users_number)) \
+                FROM sessions_log \
+                WHERE time > NOW() - interval '"+str(interval)+" minutes' \
+                UNION \
+                SELECT 'BOFERE' AS period, CEIL(AVG(users_number)) \
+                FROM sessions_log \
+                WHERE time > NOW() - interval '"+str(interval+5)+" minutes' AND time < NOW() - interval '"+str(interval)+" minutes'"
+
+        # Execute the query
+        cur.execute(query)
+
+        # Fetch the results
+        rows = cur.fetchall()
+
+        # Close the cursor
+        cur.close()
+
+        return rows

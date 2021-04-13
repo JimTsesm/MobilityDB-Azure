@@ -25,7 +25,7 @@ class K8sCluster:
         self.maximum_vm = maximum_vm
 
         self.azure = Azure.Azure()
-        self.COORDIP = self.get_coordinator_ip()
+        self.COORDIP = self.azure.get_coordinator_ip()
         self.citus_cluster = CitusCluster.CitusCluster(self.COORDIP)
 
 
@@ -91,21 +91,6 @@ class K8sCluster:
             self.delete_cluster_nodes(new_cluster_size, vm_name_list[:vm_to_delete])
             # Delete Worker nodes from Azure
             self.azure.delete_vms(vm_name_list[:vm_to_delete])
-
-    # Return Coordinator's VM public ip address
-    def get_coordinator_ip(self):
-        ip_addresses = self.azure.network_client.public_ip_addresses.list("ClusterGroup")
-        for ip in ip_addresses:
-            if(ip.name == "CoordinatorPublicIP"):
-                return ip.ip_address
-
-    # Return worker_name's public ip address
-    def get_worker_ip(self, worker_name):
-        ip_addresses = self.azure.network_client.public_ip_addresses.list("ClusterGroup")
-        for ip in ip_addresses:
-            if(ip.name == worker_name+"PublicIP"):
-                return ip.ip_address
-
 
     # Return the ip of the pod with name citus-worker-[worker_num]
     def get_pod_internal_ip(self, worker_num):

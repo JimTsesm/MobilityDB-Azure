@@ -4,6 +4,7 @@ import os
 import argparse
 import utils
 from K8sCluster import K8sCluster
+from CitusCluster import CitusCluster
 
 from daemons.prefab import run
 
@@ -22,8 +23,12 @@ class AutoscalingDaemon(run.RunDaemon):
         self.upper_threshold = upper_threshold
 
     # Get the specified metric provided by Azure at VM level.
-    def monitor(self):
+    def monitor_azure_metrics(self):
         return self.k8s_cluster.azure.monitor.get_azure_metric(metric=self.metric, interval=self.observations_interval)
+
+    # Get the system traffic using sessions_log table
+    def monitor_with_system_traffic(self):
+        return self.k8s_cluster.citus_cluster.get_sessions_log_table()
 
     # Receive the metrics computed by the monitor phase and compute the average metric of each VM.
     def analyze_with_average(self, vms_observations):
@@ -120,7 +125,7 @@ class AutoscalingDaemon(run.RunDaemon):
 
         # Run Daemon's job
         while True:
-            vote_to_scale_out, vote_to_scale_in, vote_nothing, vms_average = self.analyze_with_duration(self.monitor())
+            vote_to_scale_out, vote_to_scale_in, vote_nothing, vms_average = self.analyze_with_duration(self.monitor_azure_metrics())
             self.plan_n_execute(vote_to_scale_out, vote_to_scale_in, vote_nothing, vms_average)
             time.sleep(60)
 
