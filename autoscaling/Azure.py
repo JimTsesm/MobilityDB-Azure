@@ -80,14 +80,14 @@ class Azure:
 
     # Return Coordinator's VM public ip address
     def get_coordinator_ip(self):
-        ip_addresses = self.network_client.public_ip_addresses.list("ClusterGroup")
+        ip_addresses = self.network_client.public_ip_addresses.list(self.resource_group)
         for ip in ip_addresses:
             if (ip.name == "CoordinatorPublicIP"):
                 return ip.ip_address
 
     # Return worker_name's public ip address
     def get_worker_ip(self, worker_name):
-        ip_addresses = self.network_client.public_ip_addresses.list("ClusterGroup")
+        ip_addresses = self.network_client.public_ip_addresses.list(self.resource_group)
         for ip in ip_addresses:
             if (ip.name == worker_name + "PublicIP"):
                 return ip.ip_address

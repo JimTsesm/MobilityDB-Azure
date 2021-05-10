@@ -38,3 +38,7 @@ EOF
 sudo apt-get update
 sudo apt-get install -y kubelet kubeadm kubectl
 sudo apt-mark hold kubelet kubeadm kubectl
+
+# Install pip
+yes | sudo apt install python3-pip
+yes | sudo apt install virtualenv
