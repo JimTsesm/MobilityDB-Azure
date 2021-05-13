@@ -18,11 +18,11 @@
 ################################################################################
 #							    Configuration						   		   #
 ################################################################################
-AzureUsername="andrea.armani@student-cs.fr"
-ResourceGroupName="ULBGroup"
+AzureUsername="zas1122@hotmail.com"
+ResourceGroupName="ClusterGroup"
 Location="germanywestcentral"
-VirtualNetwork="ulbgroup-vnet"
-Subscription="Andreacs"
+VirtualNetwork="clustergroup-vnet"
+Subscription="CODE WIT"
 VMsNumber=1
 VMsSize="Standard_B2s" #Visit https://azure.microsoft.com/en-us/pricing/details/virtual-machines/series/ 
 # to see the full list of available VMs

@@ -1,3 +1,5 @@
+#Installation instructions: First run pip install setuptools-rust and then pip install -r requirements.txt
+#Create a serice principal by running az ad sp create-for-rbac --name localtest-sp-rbac (WITHOUT --skip-assignment)
 adal==1.2.7
 azure-common==1.1.27
 azure-core==1.13.0

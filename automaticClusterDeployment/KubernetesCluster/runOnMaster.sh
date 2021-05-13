@@ -7,6 +7,7 @@ sudo kubeadm init
 # Install pip
 yes | sudo apt install python3-pip
 yes | sudo apt install virtualenv
+yes | apt-get install python3-venv
 
 #Install Azure CLI
 yes | sudo apt-get update
