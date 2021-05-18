@@ -47,6 +47,10 @@ class K8sCluster:
             print("creating "+str(vm_to_create) + "VMs")
             # Call the addNewVms.sh bash script to deploy vm_to_create number of VMs
             rc = subprocess.check_call([self.SCRIPTPATH+'/addNewVms.sh', self.AZUREPASSWORD, str(max_worker_name + 1), str(max_worker_name + vm_to_create), str(max_worker_name + vm_to_create - 1)])
+            # Wait until the StatefulSet has scaled (30 seconds for each new machine)
+            time.sleep(30 * vm_to_create)
+            # Rebalance table shards
+            self.citus_cluster.rebalance_table_shards()
         # If the maximum number of VMs will be exceeded, modify the number of VMs to be added
         else:
             vm_to_create = self.maximum_vm - len(vm_name_list)
@@ -54,6 +58,10 @@ class K8sCluster:
                 print("creating " + str(vm_to_create) + "VMs")
                 # Call the addNewVms.sh bash script to deploy vm_to_create number of VMs
                 rc = subprocess.check_call([self.SCRIPTPATH+'/addNewVms.sh', self.AZUREPASSWORD, str(max_worker_name + 1), str(max_worker_name + vm_to_create), str(max_worker_name + vm_to_create -1)])
+                # Wait until the StatefulSet has scaled (30 seconds for each new machine)
+            time.sleep(30 * vm_to_create)
+                # Rebalance table shards
+                self.citus_cluster.rebalance_table_shards()
 
 
     def cluster_scale_in(self, vm_to_delete):

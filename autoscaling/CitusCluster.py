@@ -18,6 +18,18 @@ class CitusCluster:
         # Close the connection with the Citus Coordinator when the object is destroyed
         self.connection.close()
         print("Database closed successfully")
+        
+    def rebalance_table_shards(self):
+        cur = self.connection.cursor()
+        
+        # Rebalance table shards by running the corresponding query on the Coordinator
+        cur.execute("SELECT rebalance_table_shards()")
+        
+        # Commit the transaction
+        self.connection.commit()
+
+        # Close the cursor
+        cur.close()
 
     def delete_node(self, nodes_ip):
         cur = self.connection.cursor()
