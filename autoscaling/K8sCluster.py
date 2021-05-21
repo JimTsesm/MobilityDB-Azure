@@ -30,7 +30,7 @@ class K8sCluster:
 
 
     # Add vm_to_create number of VMs to the existing Kubernetes cluster
-    def cluster_scale_out(self, vm_to_create):
+    def cluster_scale_out(self, vm_to_create, performance_logger):
         vm_list = self.azure.get_deployed_vms()
         max_worker_name = 0
         vm_name_list = []
@@ -50,6 +50,7 @@ class K8sCluster:
             # Wait until the StatefulSet has scaled (30 seconds for each new machine)
             time.sleep(30 * vm_to_create)
             # Rebalance table shards
+            performance_logger.info("REBALANCING;;")
             self.citus_cluster.rebalance_table_shards()
         # If the maximum number of VMs will be exceeded, modify the number of VMs to be added
         else:
@@ -59,12 +60,13 @@ class K8sCluster:
                 # Call the addNewVms.sh bash script to deploy vm_to_create number of VMs
                 rc = subprocess.check_call([self.SCRIPTPATH+'/addNewVms.sh', self.AZUREPASSWORD, str(max_worker_name + 1), str(max_worker_name + vm_to_create), str(max_worker_name + vm_to_create -1)])
                 # Wait until the StatefulSet has scaled (30 seconds for each new machine)
-            time.sleep(30 * vm_to_create)
+                time.sleep(30 * vm_to_create)
                 # Rebalance table shards
+                performance_logger.info("REBALANCING;;")
                 self.citus_cluster.rebalance_table_shards()
 
 
-    def cluster_scale_in(self, vm_to_delete):
+    def cluster_scale_in(self, vm_to_delete, performance_logger):
         vm_list = self.azure.compute_client.virtual_machines.list("ClusterGroup")
         vm_name_list = []
         remove_flag = False
@@ -93,11 +95,14 @@ class K8sCluster:
                 # Get pod's ip
                 workers_ip.append(self.get_pod_internal_ip(vm_name_list[i]-1))
             # Delete Worker nodes from Citus cluster
+            performance_logger.info("CITUS_CLUSTER_SCALEIN;;")
             self.citus_cluster.delete_node(workers_ip)
             # Delete Worker nodes from K8s cluster
+            performance_logger.info("K8S_SCALEIN;;")
             new_cluster_size = len(vm_name_list) - vm_to_delete
             self.delete_cluster_nodes(new_cluster_size, vm_name_list[:vm_to_delete])
             # Delete Worker nodes from Azure
+            performance_logger.info("AZURE_SCALEIN;;")
             self.azure.delete_vms(vm_name_list[:vm_to_delete])
 
     # Return the ip of the pod with name citus-worker-[worker_num]

@@ -21,6 +21,10 @@ def range_type(min, max, min_required, max_required=None):
         else:
             raise argparse.ArgumentTypeError("minvm shoulb be < than maxvm.")
 
+def is_metric_valid(used_metric):
+    if used_metric not in ["cpu", "sessions"]:
+        raise argparse.ArgumentTypeError("the used_metric flag receives one of the following arguments: cpu, sessions")
+
 def list_average(integers_list, tuple_list=False):
     if(tuple_list):
         if(len(integers_list) > 0):

@@ -51,7 +51,7 @@ class CitusCluster:
         # Close the cursor
         cur.close()
 
-    def get_sessions_log_table(self, interval=5):
+    def get_sessions_log_table(self, interval=3):
         cur = self.connection.cursor()
 
         # NOW row illustrates the AVERAGE number of active sessions the last "interval" minutes.
@@ -61,7 +61,7 @@ class CitusCluster:
                 FROM sessions_log \
                 WHERE time > NOW() - interval '"+str(interval)+" minutes' \
                 UNION \
-                SELECT 'BOFERE' AS period, CEIL(AVG(users_number)) \
+                SELECT 'BEFORE' AS period, CEIL(AVG(users_number)) \
                 FROM sessions_log \
                 WHERE time > NOW() - interval '"+str(interval+5)+" minutes' AND time < NOW() - interval '"+str(interval)+" minutes'"
 

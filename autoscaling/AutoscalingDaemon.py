@@ -24,7 +24,7 @@ class AutoscalingDaemon(run.RunDaemon):
 
     # Get the specified metric provided by Azure at VM level.
     def monitor_azure_metrics(self):
-        return self.k8s_cluster.azure.monitor.get_azure_metric(metric=self.metric, interval=self.observations_interval)
+        return self.k8s_cluster.azure.monitor.get_azure_metric(metric="Percentage CPU", interval=self.observations_interval)
 
     # Get the system traffic using sessions_log table
     def monitor_with_system_traffic(self):
@@ -80,35 +80,65 @@ class AutoscalingDaemon(run.RunDaemon):
 
         return vote_to_scale_out, vote_to_scale_in, vote_nothing, vms_average
 
+    def analyze_with_user_sessions(self, query_result):
+        logging.info("analyzing with user session")
+
+        vote_to_scale_out = 0
+        vote_to_scale_in = 0
+        vote_nothing = 0
+
+        # If the database is running for sufficient amount of time
+        if(query_result[0][1] is not None):
+            # Compute the change rate of user sessions between the desired period
+            sessions_difference_percentage = (query_result[1][1] - query_result[0][1]) / query_result[0][1]
+            sessions_difference_percentage = sessions_difference_percentage * 100
+
+            self.performance_logger.info(str(sessions_difference_percentage))
+            self.performance_logger.info(str(query_result[1][1]))
+            self.performance_logger.info(str(query_result[0][1]))
+            if(sessions_difference_percentage > self.upper_threshold):
+                vote_to_scale_out = 1
+                vote_to_scale_in = 0
+            elif(sessions_difference_percentage < -1 * self.upper_threshold):
+                vote_to_scale_in = 1
+                vote_to_scale_out = 0
+
+            return vote_to_scale_out, vote_to_scale_in, vote_nothing, []
+        else:
+            return 0, 0, 0, []
+
     def plan_n_execute(self, vote_to_scale_out, vote_to_scale_in, vote_nothing, vms_average):
+        logging.info("Plan n Execute")
         # Scale out according to votes
         if(vote_to_scale_out > vote_to_scale_in and vote_to_scale_out > vote_nothing):
             self.performance_logger.info("SCALEOUT;;1")
-            self.k8s_cluster.cluster_scale_out(1)
-            self.enter_cool_down_period(10)
+            self.k8s_cluster.cluster_scale_out(2, self.performance_logger)
+            self.enter_cool_down_period(30)
         # Scale in according to votes
         elif(vote_to_scale_out < vote_to_scale_in and vote_to_scale_in > vote_nothing):
             self.performance_logger.info("SCALEIN;;1")
-            self.k8s_cluster.cluster_scale_in(1)
-            self.enter_cool_down_period(10)
+            self.k8s_cluster.cluster_scale_in(2, self.performance_logger)
+            self.enter_cool_down_period(30)
+        elif(not vms_average):
+            self.performance_logger.info("DONOTHING;;1")
+            return
         # If no decision can be taken according to votes, compute the global average metric
         else:
             global_average = utils.list_average(vms_average)
             if(global_average > self.upper_threshold):
                 self.performance_logger.info("SCALEOUT;;1")
-                self.k8s_cluster.cluster_scale_out(1)
-                self.enter_cool_down_period(10)
+                self.k8s_cluster.cluster_scale_out(2, self.performance_logger)
+                self.enter_cool_down_period(30)
             elif(global_average < self.lower_threshold):
                 self.performance_logger.info("SCALEIN;;1")
-                self.k8s_cluster.cluster_scale_in(1)
-                self.enter_cool_down_period(10)
+                self.k8s_cluster.cluster_scale_in(2, self.performance_logger)
+                self.enter_cool_down_period(30)
 
 
     def enter_cool_down_period(self, minutes):
         self.performance_logger.info("COOLDOWN;;"+str(minutes))
         # Sleep
         time.sleep(minutes * 60)
-
 
     def run(self):
 
@@ -123,13 +153,21 @@ class AutoscalingDaemon(run.RunDaemon):
         # to be handled according to start/restart
         self.k8s_cluster = K8sCluster(self.minvm, self.maxvm)
 
-        # Run Daemon's job
-        while True:
-            vote_to_scale_out, vote_to_scale_in, vote_nothing, vms_average = self.analyze_with_duration(self.monitor_azure_metrics())
-            self.plan_n_execute(vote_to_scale_out, vote_to_scale_in, vote_nothing, vms_average)
-            time.sleep(60)
-
-
+        if (self.metric == "sessions"):
+            logging.info("Autoscaling using user sessions...")
+            # Run Daemon's job
+            while True:
+                vote_to_scale_out, vote_to_scale_in, vote_nothing, vms_average = self.analyze_with_user_sessions(
+                    self.monitor_with_system_traffic())
+                self.plan_n_execute(vote_to_scale_out, vote_to_scale_in, vote_nothing, vms_average)
+                time.sleep(60)
+        elif (self.metric == "cpu"):
+            logging.info("Autoscaling using CPU...")
+            # Run Daemon's job
+            while True:
+                vote_to_scale_out, vote_to_scale_in, vote_nothing, vms_average = self.analyze_with_duration(self.monitor_azure_metrics())
+                self.plan_n_execute(vote_to_scale_out, vote_to_scale_in, vote_nothing, vms_average)
+                time.sleep(60)
 
 if __name__ == '__main__':
 
@@ -147,11 +185,16 @@ if __name__ == '__main__':
                         help='Specify the lower threshold for the metric.')
     parser.add_argument('--upper_th', dest='upper_threshold', required=True,
                         help='Specify the upper threshold for the metric.')
+    parser.add_argument('--metric', dest='used_metric', required=True,
+                        help='Specify the desired metric to be used. The available metrics are: sessions (A metric that monitors the users activity and adapt the size of the cluster to the number of users), cpu (A metric that uses the CPU percentage of the VMs)')
     args = parser.parse_args()
 
     # Check if range arguments are correct
     utils.range_type(args.minvm, args.maxvm, 0)
     utils.range_type(args.lower_threshold, args.upper_threshold, 0, 100)
+
+    # Check if metric argument is correct
+    utils.is_metric_valid(args.used_metric)
 
     performance_logger = utils.setup_loggers()
 
@@ -160,7 +203,7 @@ if __name__ == '__main__':
 
     d = AutoscalingDaemon(pidfile, performance_logger, int(args.minvm), int(args.maxvm),
                           args.storage_path, int(args.lower_threshold), int(args.upper_threshold),
-                          metric="Percentage CPU", observations_interval=3
+                          args.used_metric, observations_interval=3
                           )
 
     # Decide which Daemon action to do
