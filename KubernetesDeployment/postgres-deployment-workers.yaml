@@ -45,6 +45,8 @@ spec:
             - ssl_cert_file=/etc/postgresql-secrets-vol/server.crt
             - -c
             - ssl_key_file=/etc/postgresql-secrets-vol/server.key
+            - -c
+            - max_connections=500
           ports:
             - containerPort: 5432
           lifecycle:
