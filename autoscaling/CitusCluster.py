@@ -20,16 +20,23 @@ class CitusCluster:
         print("Database closed successfully")
         
     def rebalance_table_shards(self):
-        cur = self.connection.cursor()
-        
-        # Rebalance table shards by running the corresponding query on the Coordinator
-        cur.execute("SELECT rebalance_table_shards()")
-        
-        # Commit the transaction
-        self.connection.commit()
+        try:
+            cur = self.connection.cursor()
 
-        # Close the cursor
-        cur.close()
+            # Rebalance table shards by running the corresponding query on the Coordinator
+            cur.execute("SELECT rebalance_table_shards()")
+
+            # Commit the transaction
+            self.connection.commit()
+
+            # Close the cursor
+            cur.close()
+        except psycopg2.DatabaseError as e:
+            print("Exception!!!")
+            print(e)
+            # Close the cursor
+            cur.close()
+            self.rebalance_table_shards()
 
     def delete_node(self, nodes_ip):
         cur = self.connection.cursor()
