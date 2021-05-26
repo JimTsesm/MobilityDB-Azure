@@ -12,10 +12,13 @@ VMsSize="Standard_A1_v2" #Visit https://azure.microsoft.com/en-us/pricing/detail
 SSHPublicKeyPath="~/.ssh/id_rsa.pub"
 SSHPrivateKeyPath="~/.ssh/id_rsa"
 Gitrepo="https://github.com/JimTsesm/MobilityDB-in-Azure-Deployment.git"
+Service_app_url="http://python-app2"
+Service_tenant="18f19e28-1ea1-4b0c-bbc0-cf7538f92d05"
 ################################################################################
 
-#Login to Azure using Azure CLI
-az login -u $AzureUsername -p $1
+#Login to Azure using Azure CLI and Serice Principal credentials
+#az login -u $AzureUsername -p $1
+az login --service-principal -u "$Service_app_url" -p $1 --tenant "$Service_tenant"
 
 #Select the desired subscription
 az account set --subscription "$Subscription"
@@ -43,8 +46,9 @@ do
 	az vm open-port -g $ResourceGroupName -n $VMName --port 5432 --priority 1010;
 
 	#Clone the github repository to the VM
-	az vm run-command invoke -g $ResourceGroupName -n $VMName --command-id RunShellScript --scripts "git clone $Gitrepo /home/azureuser/MobilityDB-in-Azure"
+	az vm run-command invoke -g $ResourceGroupName -n $VMName --command-id RunShellScript --scripts "git clone $Gitrepo /home/azureuser/MobilityDB-in-Azure" &
 done
+wait #for all the subprocesses of the parallel loop to terminate
 
 #Install the required software to every Worker
 #The for loop is executed in parallel. This means that every Worker will install the software at the same time.
