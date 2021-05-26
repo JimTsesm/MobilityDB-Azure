@@ -190,8 +190,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Check if range arguments are correct
-    utils.range_type(args.minvm, args.maxvm, 0)
-    utils.range_type(args.lower_threshold, args.upper_threshold, 0, 100)
+    utils.range_type(args.used_metric, args.minvm, args.maxvm, 0)
+    utils.range_type(args.used_metric, args.lower_threshold, args.upper_threshold, 0, 100)
 
     # Check if metric argument is correct
     utils.is_metric_valid(args.used_metric)

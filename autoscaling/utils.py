@@ -2,7 +2,9 @@ import argparse
 import logging
 
 
-def range_type(min, max, min_required, max_required=None):
+def range_type(metric, min, max, min_required, max_required=None):
+    if(metric not in ["cpu"]):
+        return
     try:
         min = int(min)
         max = int(max)

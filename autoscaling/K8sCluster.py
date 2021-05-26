@@ -19,7 +19,7 @@ class K8sCluster:
         config.load_kube_config()
         self.k8s = client.CoreV1Api()
 
-        self.AZUREPASSWORD = os.environ['AZURE_PASSWORD']
+        self.AZUREPASSWORD = os.environ['AZURE_CLIENT_SECRET']
         self.SCRIPTPATH = os.environ['SCRIPTPATH']
         self.minimum_vms = minimum_vms
         self.maximum_vm = maximum_vm
