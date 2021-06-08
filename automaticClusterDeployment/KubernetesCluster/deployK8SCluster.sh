@@ -19,9 +19,9 @@
 #							    Configuration						   		   #
 ################################################################################
 AzureUsername="zas1122@hotmail.com"
-ResourceGroupName="ClusterGroup"
+ResourceGroupName="TestGroup"
 Location="germanywestcentral"
-VirtualNetwork="clustergroup-vnet"
+VirtualNetwork="test-vnet"
 Subscription="CODE WIT"
 VMsNumber=1
 VMsSize="Standard_B2s" #Visit https://azure.microsoft.com/en-us/pricing/details/virtual-machines/series/ 
@@ -29,11 +29,14 @@ VMsSize="Standard_B2s" #Visit https://azure.microsoft.com/en-us/pricing/details/
 SSHPublicKeyPath="~/.ssh/id_rsa.pub"
 SSHPrivateKeyPath="~/.ssh/id_rsa"
 Gitrepo="https://github.com/JimTsesm/MobilityDB-in-Azure-Deployment.git"
+Service_app_url="http://python-app2"
+Service_tenant="18f19e28-1ea1-4b0c-bbc0-cf7538f92d05"
 ################################################################################
 
 
 #Login to Azure using Azure CLI
-read -sp "Azure password: " AZ_PASS && echo && az login -u $AzureUsername -p $AZ_PASS
+#read -sp "Azure password: " AZ_PASS && echo && az login -u $AzureUsername -p $AZ_PASS
+read -sp "Azure Client secret: " AZ_PASS && echo && az login --service-principal -u "$Service_app_url" -p $AZ_PASS --tenant "$Service_tenant"
 
 #Select the desired subscription
 az account set --subscription "$Subscription"
