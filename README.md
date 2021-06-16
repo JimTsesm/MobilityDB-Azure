@@ -55,7 +55,7 @@ Assuming we have successfully done all the previous step, we are now ready to tu
 <li>Replace   the   parameters   on   the top of the <strong>MobilityDB-in-Azure/autoscaling/scripts/addNewVms.sh </strong> file with the same parameters that you provided in <strong>MobilityDB-in-Azure/automaticClusterDeployment/KubernetesCluster/deployK8SCluster.sh</strong>.</li>
 <li>Execute <code>sudo -s</code> command on the Coordinator VM to get root access rights.</li>
 <li>Create a virtual environment by running <code>python3 -m venv venv</code> and activate it <code>source venv/bin/activate</code></li>
-<li>Install the required packages by first running <code>pip install setuptools-rust,ex-port CRYPTOGRAPHY_DONT_BUILD_RUST=1<code> and <code>pip install -r MobilityDB-in-Azure/autoscaling/requirements.txt</code>.</li>
+<li>Install the required packages by first running <code>pip install setuptools-rust</code>, <code>export CRYPTOGRAPHY_DONT_BUILD_RUST=1</code> and <code>pip install -r MobilityDB-in-Azure/autoscaling/requirements.txt</code>.</li>
 <li>Export the following environment variables, by adjusting their values as follows:</li>
     <ul>
     <li><code>export AZURE_SUBSCRIPTION_ID=...</code>, <code>export AZURE_TENANT_ID=...</code>, <code>export   AZURE_CLIENT_ID=...</code> and <code>export AZURE_CLIENT_SECRET=...</code> by specifying the corresponding values from the Azure Service Principal.</li>
