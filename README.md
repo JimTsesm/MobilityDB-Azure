@@ -43,7 +43,7 @@ Until now we have created a Kubernetes cluster on Azure. The purpose of this sec
 
 Now you are ready to connect to your distributed PostgreSQL cluster. After connecting to the Coordinator VM, execute the following shell command to ensure that the Pods are running, as show in the following screenshot : `sudo kubectl get pods -o wide`. Normally, you should see one Pod hosting the citus-master and a number of citus-worker Pods, equal to the replica number that you defined before.<br><br>
 
-![alt text](readme images/pods_screenshot.png)
+![alt text](readme_images/pods_screenshot.png)
 
 You can connect to the Citus Coordinator by using the **public ip** of the master VM as **host name/address**, **30001 as port**, **postgres as database** and the **username** and **password** that you defined before. The default values are **postgresadmin** and **admin1234**, respectively. Try to execute some Citus or MobilityDB queries. For instance, run `select master_get_active_worker_nodes()` to view the available Citus worker nodes.
 
