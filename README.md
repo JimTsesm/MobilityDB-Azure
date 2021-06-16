@@ -16,15 +16,15 @@ This work combines different tools and technologies to create a self-managed dat
 To deploy a MobilityDB cluster on Azure, follow the below steps:
 <ol>
 <li>Clone the Github repository</li>
-<li>Execute the bash script by running `bash MobilityDB-in-Azure/automaticClusterDeployment/KubernetesCluster/deployK8SCluster.sh`. **Before running the script**, the parameters placed on the top of the file needs to be configured as follows:
+<li>Execute the bash script by running <code>bash MobilityDB-in-Azure/automaticClusterDeployment/KubernetesCluster/deployK8SCluster.sh</code>. **Before running the script**, the parameters placed on the top of the file needs to be configured as follows:
     <ul>
-    <li>`AzureUsername` parameter is used to login to your Azure account.</li>
-    <li>The default `ResourceGroupName`,`Location` and `VirtualNetwork` values can be used.</li>
-    <li>`Subscription` defines the name of the active Azure subscription.</li>
-    <li>`VMsNumber` determines the number of Worker nodes and `VMsSize` the size of each machine</li>
-    <li>`SSHPublicKeyPath` and `SSHPrivateKeyPath` values specify the location of the ssh private and public keys to access the created VMs. By default, the files will be stored in **~/.ssh/** directory.</li>
-    <li>`Gitrepo` specifies the Github repository from which the installation scripts and the rest source files will be found.</li>
-    <li>`Service_app_url` determines  the  url  of  the  Service  Principal  and `Service_tenant` the tenant’s id. When executing the script, the `Client secret` should be given by the user to authenticate the application in Azure.</li>
+    <li><code>AzureUsername</code> parameter is used to login to your Azure account.</li>
+    <li>The default <code>ResourceGroupName</code>,<code>Location</code> and <code>VirtualNetwork</code> values can be used.</li>
+    <li><code>Subscription</code> defines the name of the active Azure subscription.</li>
+    <li><code>VMsNumber</code> determines the number of Worker nodes and <code>VMsSize</code> the size of each machine</li>
+    <li><code>SSHPublicKeyPath</code> and <code>SSHPrivateKeyPath</code> values specify the location of the ssh private and public keys to access the created VMs. By default, the files will be stored in **~/.ssh/** directory.</li>
+    <li><code>Gitrepo</code> specifies the Github repository from which the installation scripts and the rest source files will be found.</li>
+    <li><code>Service_app_url</code> determines  the  url  of  the  Service  Principal  and <code>Service_tenant</code> the tenant’s id. When executing the script, the <code>Client secret</code> should be given by the user to authenticate the application in Azure.</li>
     </ul>
 </li>
 </ol>
