@@ -11,7 +11,7 @@ VMsSize="Standard_A1_v2" #Visit https://azure.microsoft.com/en-us/pricing/detail
 # to see the full list of available VMs
 SSHPublicKeyPath="~/.ssh/id_rsa.pub"
 SSHPrivateKeyPath="~/.ssh/id_rsa"
-Gitrepo="https://github.com/JimTsesm/MobilityDB-in-Azure-Deployment.git"
+Gitrepo="https://github.com/JimTsesm/MobilityDB-in-Azure.git"
 Service_app_url="http://python-app2"
 Service_tenant="18f19e28-1ea1-4b0c-bbc0-cf7538f92d05"
 ################################################################################
