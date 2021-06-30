@@ -23,12 +23,12 @@ ResourceGroupName="TestGroup"
 Location="germanywestcentral"
 VirtualNetwork="test-vnet"
 Subscription="CODE WIT"
-VMsNumber=1
+VMsNumber=4
 VMsSize="Standard_B2s" #Visit https://azure.microsoft.com/en-us/pricing/details/virtual-machines/series/ 
 # to see the full list of available VMs
 SSHPublicKeyPath="~/.ssh/id_rsa.pub"
 SSHPrivateKeyPath="~/.ssh/id_rsa"
-Gitrepo="https://github.com/JimTsesm/MobilityDB-in-Azure-Deployment.git"
+Gitrepo="https://github.com/JimTsesm/MobilityDB-in-Azure.git"
 Service_app_url="http://python-app2"
 Service_tenant="18f19e28-1ea1-4b0c-bbc0-cf7538f92d05"
 ################################################################################
@@ -66,7 +66,7 @@ az vm open-port -g $ResourceGroupName -n $VMName --port 30001 --priority 1030;
 #Clone the github repository to the VM
 az vm run-command invoke -g $ResourceGroupName -n $VMName --command-id RunShellScript --scripts "git clone $Gitrepo /home/azureuser/MobilityDB-in-Azure"
 
-#Execute the previously sent bash file	 	
+#Execute the installtion scripts from the clone GitHub repository	 	
 az vm run-command invoke -g $ResourceGroupName -n $VMName --command-id RunShellScript --scripts "sudo bash /home/azureuser/MobilityDB-in-Azure/automaticClusterDeployment/KubernetesCluster/installDockerK8s.sh"
 az vm run-command invoke -g $ResourceGroupName -n $VMName --command-id RunShellScript --scripts "sudo bash /home/azureuser/MobilityDB-in-Azure/automaticClusterDeployment/KubernetesCluster/runOnMaster.sh"
 az vm run-command invoke -g $ResourceGroupName -n $VMName --command-id RunShellScript --scripts "sudo bash /home/azureuser/MobilityDB-in-Azure/automaticClusterDeployment/KubernetesCluster/runOnMaster2.sh"
@@ -89,33 +89,48 @@ do
 	VMName="Worker$i";
 
 	#Create the VM
-	az vm create	--name $VMName --resource-group $ResourceGroupName --public-ip-address-allocation static --image "UbuntuLTS" --size $VMsSize --vnet-name $VirtualNetwork --subnet default --ssh-key-value $SSHPublicKeyPath --admin-username azureuser;
-
-	#Open port 5432 to accept inbound connection from the Citus coordinator
-	az vm open-port -g $ResourceGroupName -n $VMName --port 5432 --priority 1010;
-
-	#Clone the github repository to the VM
-	az vm run-command invoke -g $ResourceGroupName -n $VMName --command-id RunShellScript --scripts "git clone $Gitrepo /home/azureuser/MobilityDB-in-Azure"
+	az vm create	--name $VMName --resource-group $ResourceGroupName --public-ip-address-allocation static --image "UbuntuLTS" --size $VMsSize --vnet-name $VirtualNetwork --subnet default --ssh-key-value $SSHPublicKeyPath --admin-username azureuser &
 
 done
+wait #for all the subprocesses of the parallel loop to terminate
 
+for i in $(seq 1 $VMsNumber)
+do
+	VMName="Worker$i";
+
+	#Open port 5432 to accept inbound connection from the Citus coordinator
+	az vm open-port -g $ResourceGroupName -n $VMName --port 5432 --priority 1010 &
+
+done
+wait #for all the subprocesses of the parallel loop to terminate
+
+for i in $(seq 1 $VMsNumber)
+do
+	VMName="Worker$i";
+
+	#Clone the github repository to the VM
+	az vm run-command invoke -g $ResourceGroupName -n $VMName --command-id RunShellScript --scripts "git clone $Gitrepo /home/azureuser/MobilityDB-in-Azure" &
+
+done
+wait #for all the subprocesses of the parallel loop to terminate
+	
 #Install the required software to every Worker
 #The for loop is executed in parallel. This means that every Worker will install the software at the same time.
 for i in $(seq 1 $VMsNumber)
 do
 	VMName="Worker$i";
 	
-	#Execute the previously sent bash file	 	
+	#Execute the installtion script from the clone GitHub repository	 	
 	az vm run-command invoke -g $ResourceGroupName -n $VMName --command-id RunShellScript --scripts "sudo bash /home/azureuser/MobilityDB-in-Azure/automaticClusterDeployment/KubernetesCluster/installDockerK8s.sh" &
 done
 wait #for all the subprocesses of the parallel loop to terminate
 
-#Run the initialization commands to each Worker
+#Run the initialization commands in each Worker
 for i in $(seq 1 $VMsNumber)
 do
 	VMName="Worker$i";
 	
-	#Execute the previously sent bash file	 	
+	#Execute the installtion script from the clone GitHub repository	 	
 	az vm run-command invoke -g $ResourceGroupName -n $VMName --command-id RunShellScript --scripts "sudo bash /home/azureuser/MobilityDB-in-Azure/automaticClusterDeployment/KubernetesCluster/runOnWorker.sh" &
 done
 wait #for all the subprocesses of the parallel loop to terminate
