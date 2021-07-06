@@ -1,32 +1,31 @@
 # Self-scalable Moving Object Databases on the Cloud: MobilityDB and Azure
 
-This work has been performed during the 4rth semester of my MSc in Big Data Management and Analytics and it consists the product of my master's thesis. <br>
-The repository includes the detailed report of this master's thesis.
+This work has been performed during the 4rth semester of my MSc in Big Data Management and Analytics and it consists the product of my master's thesis. <br> The repository includes a detailed report.
 
 ## Abstract
 PostgreSQL is one of the most promising and quickly evolving Relational
 database management systems. Being a fully extensible system, there are plenty of
 projects that build functionalities on top of PostgreSQL. MobilityDB is such a tool
 that enables users to efficiently store, manage and query moving object data, such
-as data produced by fleets of vehicles. <br>
+as data produced by fleets of vehicles. <br><br>
 Living in the era of Big Data technologies and cloud computing, it is vital for
 cutting-edge database management systems to provide cloud native solutions that
 allow data processing at scale. Citus is such a tool that transforms any PostgreSQL
-server into a distributed database, without preventing any PostgreSQL native functionality.<br>
+server into a distributed database, without preventing any PostgreSQL native functionality.<br><br>
 Deploying a MobilityDB cluster using Citus on the cloud is rather a simple
 task. It requires deep knowledge of handling the provided infrastructure, configuring
 the network between the machines as well as time and effort to learn and
 manage the peculiarities of each cloud provider. In addition, maintaining a scalable
 system requires continuous monitoring of several factors and metrics that depict
 the performance of the system. Such a task implies repeating human effort that is
-sometime prone to errors.<br>
+sometime prone to errors.<br><br>
 In this work, we aim to target the aforementioned challenges by introducing
 automation to the rolling out process of a MobilityDB cluster on Microsoft Azure
 as well as to partially automate the management and maintenance of the deployed
 solution. Moreover, we provide a tool, called autoscaler, that is capable of automatically
 monitoring the database cluster, analyzing the collected performance metrics
 and making decisions that adapt the size of the cluster, according to the measured
-workload.<br>
+workload.<br><br>
 To assess the performance of our solution, we perform several experiments that
 combine two different benchmarks, namely BerlinMOD and Scalar benchmarks.
 The first provides a synthetic dataset that simulates the behavior of moving vehicles
