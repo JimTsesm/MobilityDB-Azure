@@ -32,6 +32,10 @@ The first provides a synthetic dataset that simulates the behavior of moving veh
 across Berlin, while the second one is used to simulate a number of concurrent
 user requests that query the system under test.
 
+## Automated Cluster Initialization
+One major part of this work is to enable users to automatically deploy MobilityDB on Azure. Someone can use our software to roll out a MobilityDB cluster along with Citus extension with minimum human interaction. The image below depicts the cluster generation process.
+![MobilityDB cluster initialization diagram](readme_images/automaticClusterGeneration.svg)
+
 ## Execution Guidelines
 
 The purpose of this section is to enable the user reuse the existing work.
