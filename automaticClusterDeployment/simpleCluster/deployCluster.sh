@@ -24,7 +24,7 @@ VMsSize="Standard_B1ls" #Visit https://azure.microsoft.com/en-us/pricing/details
 # to see the full list of available VMs
 SSHPublicKeyPath="~/.ssh/id_rsa.pub"
 SSHPrivateKeyPath="~/.ssh/id_rsa"
-InstallationScript="/home/dimitris/Desktop/thesis/MobilityDB-in-Azure/automaticClusterDeployment/installMobilityDB.sh"
+InstallationScript="/home/dimitris/Desktop/thesis/MobilityDB-Azure/automaticClusterDeployment/installMobilityDB.sh"
 ################################################################################
 
 

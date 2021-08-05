@@ -67,9 +67,9 @@ az vm open-port -g $ResourceGroupName -n $VMName --port 30001 --priority 1030;
 az vm run-command invoke -g $ResourceGroupName -n $VMName --command-id RunShellScript --scripts "git clone $Gitrepo /home/azureuser/MobilityDB-in-Azure"
 
 #Execute the installtion scripts from the clone GitHub repository	 	
-az vm run-command invoke -g $ResourceGroupName -n $VMName --command-id RunShellScript --scripts "sudo bash /home/azureuser/MobilityDB-in-Azure/automaticClusterDeployment/KubernetesCluster/installDockerK8s.sh"
-az vm run-command invoke -g $ResourceGroupName -n $VMName --command-id RunShellScript --scripts "sudo bash /home/azureuser/MobilityDB-in-Azure/automaticClusterDeployment/KubernetesCluster/runOnMaster.sh"
-az vm run-command invoke -g $ResourceGroupName -n $VMName --command-id RunShellScript --scripts "sudo bash /home/azureuser/MobilityDB-in-Azure/automaticClusterDeployment/KubernetesCluster/runOnMaster2.sh"
+az vm run-command invoke -g $ResourceGroupName -n $VMName --command-id RunShellScript --scripts "sudo bash /home/azureuser/MobilityDB-Azure/automaticClusterDeployment/KubernetesCluster/installDockerK8s.sh"
+az vm run-command invoke -g $ResourceGroupName -n $VMName --command-id RunShellScript --scripts "sudo bash /home/azureuser/MobilityDB-Azure/automaticClusterDeployment/KubernetesCluster/runOnMaster.sh"
+az vm run-command invoke -g $ResourceGroupName -n $VMName --command-id RunShellScript --scripts "sudo bash /home/azureuser/MobilityDB-Azure/automaticClusterDeployment/KubernetesCluster/runOnMaster2.sh"
 
 #Get Join token from the logs of the previous command (sudo kubeadm init)
 #Operations: cat the log, remove \n and \, get everything after "kubeadm join" until the next \ and finally remove the \
@@ -121,7 +121,7 @@ do
 	VMName="Worker$i";
 	
 	#Execute the installtion script from the clone GitHub repository	 	
-	az vm run-command invoke -g $ResourceGroupName -n $VMName --command-id RunShellScript --scripts "sudo bash /home/azureuser/MobilityDB-in-Azure/automaticClusterDeployment/KubernetesCluster/installDockerK8s.sh" &
+	az vm run-command invoke -g $ResourceGroupName -n $VMName --command-id RunShellScript --scripts "sudo bash /home/azureuser/MobilityDB-Azure/automaticClusterDeployment/KubernetesCluster/installDockerK8s.sh" &
 done
 wait #for all the subprocesses of the parallel loop to terminate
 
@@ -131,7 +131,7 @@ do
 	VMName="Worker$i";
 	
 	#Execute the installtion script from the clone GitHub repository	 	
-	az vm run-command invoke -g $ResourceGroupName -n $VMName --command-id RunShellScript --scripts "sudo bash /home/azureuser/MobilityDB-in-Azure/automaticClusterDeployment/KubernetesCluster/runOnWorker.sh" &
+	az vm run-command invoke -g $ResourceGroupName -n $VMName --command-id RunShellScript --scripts "sudo bash /home/azureuser/MobilityDB-Azure/automaticClusterDeployment/KubernetesCluster/runOnWorker.sh" &
 done
 wait #for all the subprocesses of the parallel loop to terminate
 
@@ -153,6 +153,6 @@ echo "Worker Nodes were successfully added to the cluster."
 #								MobilityDB Deployment						   #
 ################################################################################
 
-#az vm run-command invoke -g $ResourceGroupName -n Coordinator --command-id RunShellScript --scripts "bash /home/azureuser/MobilityDB-in-Azure/KubernetesDeployment/scripts/startK8s.sh"
+#az vm run-command invoke -g $ResourceGroupName -n Coordinator --command-id RunShellScript --scripts "bash /home/azureuser/MobilityDB-Azure/KubernetesDeployment/scripts/startK8s.sh"
 
 ################################################################################

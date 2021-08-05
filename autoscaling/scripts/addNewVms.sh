@@ -57,7 +57,7 @@ do
 	VMName="Worker$i";
 
 	#Execute the installation script 	
-	az vm run-command invoke -g $ResourceGroupName -n $VMName --command-id RunShellScript --scripts "sudo bash /home/azureuser/MobilityDB-in-Azure/automaticClusterDeployment/KubernetesCluster/installDockerK8s.sh" &
+	az vm run-command invoke -g $ResourceGroupName -n $VMName --command-id RunShellScript --scripts "sudo bash /home/azureuser/MobilityDB-Azure/automaticClusterDeployment/KubernetesCluster/installDockerK8s.sh" &
 done
 wait #for all the subprocesses of the parallel loop to terminate
 
@@ -67,7 +67,7 @@ do
 	VMName="Worker$i";
 	
 	#Execute the runOnWorker.sh file to take the required actions to the Worker node	 	
-	az vm run-command invoke -g $ResourceGroupName -n $VMName --command-id RunShellScript --scripts "sudo bash /home/azureuser/MobilityDB-in-Azure/automaticClusterDeployment/KubernetesCluster/runOnWorker.sh" &
+	az vm run-command invoke -g $ResourceGroupName -n $VMName --command-id RunShellScript --scripts "sudo bash /home/azureuser/MobilityDB-Azure/automaticClusterDeployment/KubernetesCluster/runOnWorker.sh" &
 done
 wait #for all the subprocesses of the parallel loop to terminate
 
