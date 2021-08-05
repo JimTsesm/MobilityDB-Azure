@@ -38,7 +38,7 @@ One major part of this work is to enable users to automatically deploy MobilityD
 
 ## Kubernetes Architecture
 After deploying the cluster, a Kubernetes deployment should be launched to initialize the corresponding Pods. The following image illustrates the final Kubernetes deployment.
-![Kubernetes architecture](readme_images/K8S_Architecture-slides_version.svg)
+![Kubernetes architecture](readme_images/K8S_Architecture-slides_version.jpg)
 
 ## Execution Guidelines
 
