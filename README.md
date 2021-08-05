@@ -36,6 +36,10 @@ user requests that query the system under test.
 One major part of this work is to enable users to automatically deploy MobilityDB on Azure. Someone can use our software to roll out a MobilityDB cluster along with Citus extension with minimum human interaction. The image below depicts the cluster generation process.
 ![MobilityDB cluster initialization diagram](readme_images/automaticClusterGeneration.svg)
 
+## Kubernetes Architecture
+After deploying the cluster, a Kubernetes deployment should be launched to initialize the corresponding Pods. The following image illustrates the final Kubernetes deployment.
+![Kubernetes architecture](readme_images/K8S Architecture-slides version.svg)
+
 ## Execution Guidelines
 
 The purpose of this section is to enable the user reuse the existing work.
