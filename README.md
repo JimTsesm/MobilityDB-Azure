@@ -3,12 +3,12 @@
 This work has been performed during the 4rth semester of my MSc in Big Data Management and Analytics and it consists the product of my master's thesis. <br> The repository includes a detailed report.
 
 ## Abstract
-PostgreSQL is one of the most promising and quickly evolving Relational
+PostgreSQL is one of the most promising and quickly evolving relational
 database management systems. Being a fully extensible system, there are plenty of
 projects that build functionalities on top of PostgreSQL. MobilityDB is such a tool
 that enables users to efficiently store, manage and query moving object data, such
 as data produced by fleets of vehicles. <br><br>
-Living in the era of Big Data technologies and cloud computing, it is vital for
+Living in the era of big data technologies and cloud computing, it is vital for
 cutting-edge database management systems to provide cloud native solutions that
 allow data processing at scale. Citus is such a tool that transforms any PostgreSQL
 server into a distributed database, without preventing any PostgreSQL native functionality.<br><br>
