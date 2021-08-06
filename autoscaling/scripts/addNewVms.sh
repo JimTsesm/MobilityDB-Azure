@@ -2,12 +2,12 @@
 ################################################################################
 #							    Configuration						   		   #
 ################################################################################
-AzureUsername="andrea.armani@student-cs.fr"
-ResourceGroupName="ClusterGroup"
+AzureUsername="zas1122@hotmail.com"
+ResourceGroupName="TestGroup"
 Location="germanywestcentral"
-VirtualNetwork="clustergroup-vnet"
-Subscription="Andreacs"
-VMsSize="Standard_A1_v2" #Visit https://azure.microsoft.com/en-us/pricing/details/virtual-machines/series/ 
+VirtualNetwork="test-vnet"
+Subscription="CODE WIT"
+VMsSize="Standard_B2s" #Visit https://azure.microsoft.com/en-us/pricing/details/virtual-machines/series/ 
 # to see the full list of available VMs
 SSHPublicKeyPath="~/.ssh/id_rsa.pub"
 SSHPrivateKeyPath="~/.ssh/id_rsa"
