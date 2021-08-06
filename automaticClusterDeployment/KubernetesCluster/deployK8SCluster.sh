@@ -23,12 +23,12 @@ ResourceGroupName="TestGroup"
 Location="germanywestcentral"
 VirtualNetwork="test-vnet"
 Subscription="CODE WIT"
-VMsNumber=4
+VMsNumber=1
 VMsSize="Standard_B2s" #Visit https://azure.microsoft.com/en-us/pricing/details/virtual-machines/series/ 
 # to see the full list of available VMs
 SSHPublicKeyPath="~/.ssh/id_rsa.pub"
 SSHPrivateKeyPath="~/.ssh/id_rsa"
-Gitrepo="https://github.com/JimTsesm/MobilityDB-in-Azure.git"
+Gitrepo="https://github.com/JimTsesm/MobilityDB-Azure.git"
 Service_app_url="http://python-app2"
 Service_tenant="18f19e28-1ea1-4b0c-bbc0-cf7538f92d05"
 ################################################################################
@@ -64,7 +64,7 @@ az vm open-port -g $ResourceGroupName -n $VMName --port 30001 --priority 1030;
 
 
 #Clone the github repository to the VM
-az vm run-command invoke -g $ResourceGroupName -n $VMName --command-id RunShellScript --scripts "git clone $Gitrepo /home/azureuser/MobilityDB-in-Azure"
+az vm run-command invoke -g $ResourceGroupName -n $VMName --command-id RunShellScript --scripts "git clone $Gitrepo /home/azureuser/MobilityDB-Azure"
 
 #Execute the installtion scripts from the clone GitHub repository	 	
 az vm run-command invoke -g $ResourceGroupName -n $VMName --command-id RunShellScript --scripts "sudo bash /home/azureuser/MobilityDB-Azure/automaticClusterDeployment/KubernetesCluster/installDockerK8s.sh"
@@ -109,7 +109,7 @@ do
 	VMName="Worker$i";
 
 	#Clone the github repository to the VM
-	az vm run-command invoke -g $ResourceGroupName -n $VMName --command-id RunShellScript --scripts "git clone $Gitrepo /home/azureuser/MobilityDB-in-Azure" &
+	az vm run-command invoke -g $ResourceGroupName -n $VMName --command-id RunShellScript --scripts "git clone $Gitrepo /home/azureuser/MobilityDB-Azure" &
 
 done
 wait #for all the subprocesses of the parallel loop to terminate
