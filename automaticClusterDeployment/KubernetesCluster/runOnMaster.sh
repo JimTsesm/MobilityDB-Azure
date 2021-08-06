@@ -7,6 +7,8 @@ yes | sudo apt install python3-pip
 yes | sudo apt install virtualenv
 yes | apt-get install python3-venv
 
+yes | sudo apt-get install libssl-dev
+
 #Install Azure CLI
 yes | sudo apt-get update
 yes | sudo apt-get install ca-certificates curl apt-transport-https lsb-release gnupg
