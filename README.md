@@ -27,7 +27,7 @@ monitoring the database cluster, analyzing the collected performance metrics
 and making decisions that adapt the size of the cluster, according to the measured
 workload.<br><br>
 To assess the performance of our solution, we perform several experiments that
-combine two different benchmarks, namely BerlinMOD and Scalar benchmarks.
+combine two different benchmarks, namely [BerlinMOD](https://github.com/MobilityDB/MobilityDB-BerlinMOD) and [Scalar](https://distrinet.cs.kuleuven.be/software/scalar/) benchmarks.
 The first provides a synthetic dataset that simulates the behavior of moving vehicles
 across Berlin, while the second one is used to simulate a number of concurrent
 user requests that query the system under test.
