@@ -45,7 +45,7 @@ After deploying the cluster, a Kubernetes deployment should be launched to initi
 The purpose of this section is to enable the user reuse the existing work.
 
 ### Required Components
-This work combines different tools and technologies to create a self-managed database on the cloud. The following list include the required components along with some links that assist the users install and configure them.
+This work combines different tools and technologies to create a self-managed database on the cloud. The following list includes the required components along with some links that assist the users to install and configure them.
 
 * A local computer running **Linux OS** (tested with Ubuntu 20.04).
 * A **Microsoft Azure account** with an active subscription attached to it. The user must have full access to the Azure resources (Owner).
@@ -62,11 +62,11 @@ To deploy a MobilityDB cluster on Azure, follow the below steps:
     <li><code>Subscription</code> defines the name of the active Azure subscription.</li>
     <li><code>VMsNumber</code> determines the number of Worker nodes and <code>VMsSize</code> the size of each machine.</li>
     <li><code>SSHPublicKeyPath</code> and <code>SSHPrivateKeyPath</code> values specify the location of the ssh private and public keys to access the created VMs. By default, the files will be stored in <strong>~/.ssh/</strong> directory.</li>
-    <li><code>Gitrepo</code> specifies the Github repository from which the installation scripts and the rest source files will be found.</li>
+    <li><code>Gitrepo</code> specifies the Github repository from which the installation scripts and the rest source files will be found. The default value should be used.</li>
     <li><code>Service_app_url</code> determines  the  url  of  the  Service  Principal  and <code>Service_tenant</code> the tenant’s id. When executing the script, the <code>Client secret</code> should be given by the user to authenticate the application in Azure.</li>
     </ul>
 </li>
-<li>Execute the script by running <code>bash MobilityDB-Azure/automaticClusterDeployment/KubernetesCluster/deployK8SCluster.sh</code>. After some few minutes, the cluster will be deployed on Azure.</li>
+<li>Execute the script by running <code>bash MobilityDB-Azure/automaticClusterDeployment/KubernetesCluster/deployK8SCluster.sh</code>. After around 15 minutes, the cluster will be deployed on Azure.</li>
 </ol>
 
 When the cluster is ready, you can access any machine using the `~/.ssh/id_rsa` key. The next step is to establish an ssh connection with the Coordinator VM. To connect to the machine, run `ssh -i ~/.ssh/id_rsa azureuser@{vm_ip_address}`, where vm_ip_address is the public ip address of the Coordinator VM that can be found inAzure portal. When connected to the VM, you can confirm that the K8S cluster has been successfully initialized by executing `sudo kubectl get nodes`.
@@ -76,7 +76,7 @@ When the cluster is ready, you can access any machine using the `~/.ssh/id_rsa` 
 Until now we have created a Kubernetes cluster on Azure. The purpose of this section is to deploy a PostgreSQL cluster with Citus and MobilityDB extensions installed. First we need to modify the provided configuration files:
 <ol>
 <li>Edit the content of <strong>MobilityDB-Azure/KubernetesDeployment/postgres-secrets-params.yaml</strong> file by changing the values of the <strong>username</strong> and <strong>password</strong>. These credentials will be the default keys to access the PostgreSQL server.  The values should be provided as base64-encoded strings. To get such an encoding, you can use the following shell command: <code>echo -n "postgres" | base64</code>.</li>
-<li>Replace the content of the folder <strong>MobilityDB-Azure/KubernetesDeployment/secrets</strong> by creating your own SSL certificate that Citus will use to encrypt the database data.</li>
+<li>Replace the content of the folder <strong>MobilityDB-Azure/KubernetesDeployment/secrets</strong> by creating your own SSL certificate that Citus will use to encrypt the database data. The existing files can be used for guidance.</li>
 <li>Edit the content of <strong>MobilityDB-Azure/KubernetesDeployment/postgres-deployment-workers.yaml</strong> by setting the replicas to be equal to the number of available worker machines that you want to create.</li>
 <li>Run <code> bash MobilityDB-Azure/KubernetesDeployment/scripts/startK8s.sh</code> to create the Kubernetes deployment. After some few minutes, the Pods will be created and ready to serve the database.</li>
 </ol>
