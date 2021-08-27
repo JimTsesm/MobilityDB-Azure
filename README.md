@@ -1,6 +1,6 @@
 # Self-scalable Moving Object Databases on the Cloud: MobilityDB and Azure
 
-This work has been performed during the 4rth semester of my MSc in Big Data Management and Analytics and it consists the product of my master's thesis. <br> The repository includes a detailed report.
+This work has been performed during the 4rth semester of my MSc in Big Data Management and Analytics and it consists the product of my master's thesis. <br> The repository includes a [detailed report](https://github.com/JimTsesm/MobilityDB-Azure/blob/main/MasterThesisReport_Dimitrios_Tsesmelis.pdf).
 
 ## Abstract
 PostgreSQL is one of the most promising and quickly evolving relational
